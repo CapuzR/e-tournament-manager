@@ -1,0 +1,212 @@
+type anon_class_13_1 = 
+ service {
+   addCardCollection: (CardCollectionArgs, vec CardArgs) -> (Result);
+   addNewAdmin: (vec principal) -> (Result_6);
+   deleteCard: (text) -> (Result_5);
+   deleteCardCollection: (text) -> (Result);
+   getAllCollections: () -> (Result_2) query;
+   getCard: (CardArgs) -> (Result_4) query;
+   getCardCollection: (text) -> (Result_3) query;
+   getCollectionsByQuery: (text) -> (Result_2) query;
+   testQueryA: (CardCollectionArgs) -> ();
+   testQueryB: (vec CardArgs) -> ();
+   updateCard: (CardArgs) -> (Result_1);
+   updateCardCollection: (CardCollectionArgs, vec CardArgs) -> (Result);
+ };
+type Value__1 = 
+ variant {
+   Array: vec Value__1;
+   Blob: blob;
+   Bool: bool;
+   Bytes: vec nat8;
+   Class: vec Property__1;
+   Float: float64;
+   Int: int;
+   Int16: int16;
+   Int32: int32;
+   Int64: int64;
+   Int8: int8;
+   Nat: nat;
+   Nat16: nat16;
+   Nat32: nat32;
+   Nat64: nat64;
+   Nat8: nat8;
+   Option: opt Value__1;
+   Principal: principal;
+   Text: text;
+ };
+type Value = 
+ variant {
+   Array: vec Value;
+   Blob: blob;
+   Bool: bool;
+   Bytes: vec nat8;
+   Class: vec Property;
+   Float: float64;
+   Int: int;
+   Int16: int16;
+   Int32: int32;
+   Int64: int64;
+   Int8: int8;
+   Nat: nat;
+   Nat16: nat16;
+   Nat32: nat32;
+   Nat64: nat64;
+   Nat8: nat8;
+   Option: opt Value;
+   Principal: principal;
+   Text: text;
+ };
+type UpdateCardError = 
+ variant {
+   NonExistentCard;
+   NotAuthorized;
+   Unknown: text;
+ };
+type Result_6 = 
+ variant {
+   err: Error;
+   ok;
+ };
+type Result_5 = 
+ variant {
+   err: CardError;
+   ok;
+ };
+type Result_4 = 
+ variant {
+   err: CardError;
+   ok: Card;
+ };
+type Result_3 = 
+ variant {
+   err: CardCollectionError;
+   ok: CardCollectionSuccess;
+ };
+type Result_2 = 
+ variant {
+   err: CardCollectionError;
+   ok: vec CardCollectionSuccess;
+ };
+type Result_1 = 
+ variant {
+   err: UpdateCardError;
+   ok;
+ };
+type Result = 
+ variant {
+   err: CardCollectionError;
+   ok;
+ };
+type Property__1 = 
+ record {
+   name: text;
+   value: Value__1;
+ };
+type Property = 
+ record {
+   name: text;
+   value: Value;
+ };
+type InitOptions = record {admins: vec principal;};
+type FilterDetails = 
+ record {
+   kind: FieldType;
+   name: text;
+ };
+type Filter = 
+ variant {
+   BountyRush: vec FilterDetails;
+   ElementumGeneral: vec FilterDetails;
+   Traits: vec FilterDetails;
+ };
+type FieldType = 
+ variant {
+   Checkbox: Checkbox;
+   Range: vec nat;
+   TextField: text;
+ };
+type Error = variant {NotAuthorized;};
+type Checkbox = record {options: vec text;};
+type CardSuccess = 
+ record {
+   collectionName: text;
+   id: text;
+   index: nat;
+   mimeType: text;
+   stats: vec CardStats;
+   thumbnail: text;
+   url: text;
+ };
+type CardStats__1 = 
+ variant {
+   BountyRush: vec Property__1;
+   ElementumGeneral: vec Property__1;
+   Traits: vec Property__1;
+ };
+type CardStats = 
+ variant {
+   BountyRush: vec Property;
+   ElementumGeneral: vec Property;
+   Traits: vec Property;
+ };
+type CardError = 
+ variant {
+   CardAlreadyExists;
+   NonExistentCard;
+   NotAuthorized;
+   Unknown: text;
+ };
+type CardCollectionSuccess = 
+ record {
+   cards: vec CardSuccess;
+   collectionId: text;
+   description: text;
+   filters: vec Filter;
+   haveMultipleAC: bool;
+   kind: text;
+   loreContext: text;
+   name: text;
+   standard: text;
+ };
+type CardCollectionError = 
+ variant {
+   CardCollectionAlreadyExists;
+   NonExistentCardCollection;
+   NotAuthorized;
+   Unknown: text;
+ };
+type CardCollectionArgs = 
+ record {
+   batchUpdate: bool;
+   collectionId: text;
+   description: text;
+   filters: vec Filter;
+   haveMultipleAC: bool;
+   kind: text;
+   loreContext: text;
+   name: text;
+   standard: text;
+ };
+type CardArgs = 
+ record {
+   collectionId: text;
+   collectionName: text;
+   id: text;
+   index: nat;
+   mimeType: text;
+   stats: vec CardStats;
+   thumbnail: text;
+   url: text;
+ };
+type Card = 
+ record {
+   collectionId: text;
+   collectionName: text;
+   index: nat;
+   mimeType: text;
+   stats: vec CardStats__1;
+   thumbnail: text;
+   url: text;
+ };
+service : (InitOptions) -> anon_class_13_1

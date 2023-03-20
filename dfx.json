@@ -1,0 +1,14 @@
+{
+    "canisters": {
+      "e_tournament_manager": {
+        "main": "src/main.mo",
+        "type": "motoko"
+      }
+    },
+    "defaults": {
+      "build": {
+        "args": "",
+        "packtool": "mops sources"
+      }
+    }
+}
