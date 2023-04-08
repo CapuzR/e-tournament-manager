@@ -36,7 +36,9 @@ export const idlFactory = ({ IDL }) => {
     'TournamentAlreadyExists' : IDL.Null,
     'NonExistentTournament' : IDL.Null,
     'NotAuthorized' : IDL.Null,
+    'TournamentHasBeingCanceled' : IDL.Null,
     'InitStatAlreadyExists' : IDL.Null,
+    'TournamentHasntStarted' : IDL.Null,
     'Unknown' : IDL.Text,
     'NonExistentCanister' : IDL.Null,
     'EmptyStats' : IDL.Null,
@@ -90,7 +92,7 @@ export const idlFactory = ({ IDL }) => {
     'deleteTournament' : IDL.Func([IDL.Text], [Result], []),
     'endTournament' : IDL.Func([IDL.Text], [Result_4], []),
     'getAllTournaments' : IDL.Func([], [Result_3], ['query']),
-    'getLeaderboard' : IDL.Func([IDL.Text], [Result_2], ['query']),
+    'getLeaderboard' : IDL.Func([IDL.Text], [Result_2], []),
     'getTournament' : IDL.Func([IDL.Text], [Result_1], ['query']),
     'updateTournament' : IDL.Func([TournamentArgs, IDL.Text], [Result], []),
   });

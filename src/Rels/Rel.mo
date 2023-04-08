@@ -165,7 +165,7 @@ module {
       };
     };
 
-    buff.toArray();
+    Buffer.toArray(buff);
   };
 
   func invert<X, Y>(rel : Trie.Trie2D<X, Y, ()>) : Trie.Trie2D<Y, X, ()> {

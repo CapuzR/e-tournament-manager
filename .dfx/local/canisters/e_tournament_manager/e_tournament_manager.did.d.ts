@@ -55,7 +55,9 @@ export interface TournamentArgs {
 export type TournamentError = { 'TournamentAlreadyExists' : null } |
   { 'NonExistentTournament' : null } |
   { 'NotAuthorized' : null } |
+  { 'TournamentHasBeingCanceled' : null } |
   { 'InitStatAlreadyExists' : null } |
+  { 'TournamentHasntStarted' : null } |
   { 'Unknown' : string } |
   { 'NonExistentCanister' : null } |
   { 'EmptyStats' : null };

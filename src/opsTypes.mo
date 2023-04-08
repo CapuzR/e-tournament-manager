@@ -79,6 +79,8 @@ module {
         #EmptyStats;
         #InitStatAlreadyExists;
         #NonExistentCanister;
+        #TournamentHasntStarted;
+        #TournamentHasBeingCanceled;
     };
 
     public type GetTournamentError = {

@@ -5,7 +5,7 @@ type anon_class_29_1 =
    deleteTournament: (text) -> (Result);
    endTournament: (text) -> (Result_4);
    getAllTournaments: () -> (Result_3) query;
-   getLeaderboard: (text) -> (Result_2) query;
+   getLeaderboard: (text) -> (Result_2);
    getTournament: (text) -> (Result_1) query;
    updateTournament: (TournamentArgs, text) -> (Result);
  };
@@ -34,6 +34,8 @@ type TournamentError =
    NonExistentTournament;
    NotAuthorized;
    TournamentAlreadyExists;
+   TournamentHasBeingCanceled;
+   TournamentHasntStarted;
    Unknown: text;
  };
 type TournamentArgs = 

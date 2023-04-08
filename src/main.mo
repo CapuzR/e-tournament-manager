@@ -71,7 +71,7 @@ shared ({ caller = owner }) actor class (
       tournamentBuff.add(tournamentSuccess);
     };
 
-    #ok(tournamentBuff.toArray());
+    #ok(Buffer.toArray(tournamentBuff));
   };
 
   public query ({ caller }) func getTournament(tournamentId : Text) : async Result.Result<OT.TournamentSuccess, OT.TournamentError> {
@@ -164,7 +164,29 @@ shared ({ caller = owner }) actor class (
       return #err(#NotAuthorized);
     };
 
+    var fullStatsRes = await _getHotLeaderboard(tournamentId);
+
+    switch (fullStatsRes) {
+      case (#ok(fullStats)) {
+
+        for (stats in fullStats.vals()) {
+          tournamentPlayerStats.put(stats);
+        };
+
+        ignore _changeStatus(tournamentId, #Finished);
+
+        #ok(());
+      };
+      case (#err(e)) {
+        #err(e);
+      };
+    };
+  };
+
+  private func _getHotLeaderboard(tournamentId : Text) : async Result.Result<[(Text, Principal, ST.TournamentPlayerStats)], OT.Error> {
+    
     let tournamentRes = _getTournament(tournamentId);
+    let tempTournamentPlayerStats : Buffer.Buffer<(Text, Principal, ST.TournamentPlayerStats)> = Buffer.Buffer(1);
 
     switch (tournamentRes) {
       case (#ok(tournament)) {
@@ -195,7 +217,7 @@ shared ({ caller = owner }) actor class (
 
             for (stats in fullStats.vals()) {
 
-              tournamentPlayerStats.put(
+              tempTournamentPlayerStats.add(
                 tournamentId,
                 stats.principal,
                 {
@@ -206,12 +228,9 @@ shared ({ caller = owner }) actor class (
                   matchesLost = stats.matchesLost;
                 },
               );
-
             };
 
-            ignore _changeStatus(tournamentId, #Finished);
-
-            #ok(());
+            #ok(Buffer.toArray(tempTournamentPlayerStats));
           };
           case (#err(e)) {
             #err(e);
@@ -222,10 +241,9 @@ shared ({ caller = owner }) actor class (
         #err(e);
       };
     };
-
   };
 
-  public query ({ caller }) func getLeaderboard(
+  public shared({ caller }) func getLeaderboard(
     tournamentId : Text,
   ) : async Result.Result<{ rewards : Text; leaderboard : [OT.PlayerStatsSuccess] }, OT.TournamentError> {
 
@@ -240,20 +258,47 @@ shared ({ caller = owner }) actor class (
         };
       };
       case (#ok(tournament)) {
-        let tournamentPlayerStatsEntries : [(Principal, ST.TournamentPlayerStats)] = tournamentPlayerStats.get0(tournamentId);
+
         let tournamentPlayerStatsBuff : Buffer.Buffer<OT.PlayerStatsSuccess> = Buffer.Buffer(1);
+        
+        switch(tournament.status) {
+          case (#OnHold) {
+            return #err(#TournamentHasntStarted);
+          };
+          case (#Canceled) {
+            return #err(#TournamentHasBeingCanceled);
+          };
+          case (#Active) {
 
-        for (pS in tournamentPlayerStatsEntries.vals()) {
-          tournamentPlayerStatsBuff.add({
-            pS.1 with principal = pS.0;
-          });
+            var tournamentPlayerStatsEntries = await _getHotLeaderboard(tournamentId);
+
+            switch (tournamentPlayerStatsEntries) {
+              case (#ok(fullStats)) {
+                for (pS in fullStats.vals()) {
+                  tournamentPlayerStatsBuff.add({
+                    pS.2 with principal = pS.1;
+                  });
+                };
+              };
+              case (#err(e)) {
+                return #err(e);
+              };
+            };
+          };
+          case (#Finished) {
+            let tournamentPlayerStatsEntries : [(Principal, ST.TournamentPlayerStats)] = tournamentPlayerStats.get0(tournamentId);
+
+            for (pS in tournamentPlayerStatsEntries.vals()) {
+              tournamentPlayerStatsBuff.add({
+                pS.1 with principal = pS.0;
+              });
+            };
+          };
         };
-
-        let tournamentPlayerStatsBuffArr = tournamentPlayerStatsBuff.toArray();
 
         #ok({
           rewards = tournament.reward;
-          leaderboard = tournamentPlayerStatsBuffArr;
+          leaderboard = Buffer.toArray(tournamentPlayerStatsBuff);
         });
 
       };
@@ -277,7 +322,7 @@ shared ({ caller = owner }) actor class (
       adminsBuff.add(principal);
     };
 
-    admins := adminsBuff.toArray();
+    admins := Buffer.toArray(adminsBuff);
     return #ok(());
 
   };
@@ -498,7 +543,7 @@ shared ({ caller = owner }) actor class (
           };
         };
 
-        let internalResults = Array.sort(internalResultsBuff.toArray(), U.compareInternalPlayerStats);
+        let internalResults = Array.sort(Buffer.toArray(internalResultsBuff), U.compareInternalPlayerStats);
 
         #ok(internalResults);
       };
@@ -566,7 +611,7 @@ shared ({ caller = owner }) actor class (
       };
     };
 
-    fullStatsBuff.toArray();
+    Buffer.toArray(fullStatsBuff);
 
   };
 
