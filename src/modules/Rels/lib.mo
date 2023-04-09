@@ -19,7 +19,7 @@ module {
 
   public type EqualPair<X, Y> =
     ( (X, X) -> Bool,
-      (Y, Y) -> Bool);
+      (Y, Y) -> Bool) ;
 
       public type Relat<X, Y> = [(X,Y)];
 

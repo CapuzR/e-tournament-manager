@@ -1,13 +1,13 @@
 // Version: 1.0.0
-type AssocList<K, V> = List<(K, V)>;
+type AssocList<K, V> = List__1<(K, V)>;
 type AssocList__1<K, V> = AssocList<K, V>;
 type Branch<K, V> = {left : Trie<K, V>; right : Trie<K, V>; size : Nat};
 type ExternalCollection__1 = {id : Text; name : Text};
-type Hash = Nat32;
+type Hash__1 = Nat32;
 type InternalCollection__1 = {id : Text; name : Text};
-type Key<K> = {hash : Hash; key : K};
+type Key<K> = {hash : Hash__1; key : K};
 type Leaf<K, V> = {keyvals : AssocList__1<Key<K>, V>; size : Nat};
-type List<T> = ?(T, List<T>);
+type List__1<T> = ?(T, List__1<T>);
 type Status__1 = {#Active; #Canceled; #Finished; #OnHold};
 type Tournament =
   {
@@ -35,7 +35,13 @@ type TournamentPlayerStats =
   };
 type Trie<K, V> = {#branch : Branch<K, V>; #empty; #leaf : Leaf<K, V>};
 actor {
-  stable var admins : [Principal];
+  stable var authState :
+    {
+      var admins : [Principal];
+      var allowedUsers : ?[Principal];
+      var auth : [Principal];
+      var gameServers : [Principal]
+    };
   stable environment : Text;
   stable var stTournamentPlayerStats :
     [(Text, Principal, TournamentPlayerStats)];

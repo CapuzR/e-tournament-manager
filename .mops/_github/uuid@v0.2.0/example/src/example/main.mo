@@ -1,7 +1,7 @@
 import Debug "mo:base/Debug";
-import UUID "mo:uuid/UUID";
-import Source "mo:uuid/Source";
-import AsyncSource "mo:uuid/async/SourceV4";
+import UUID "mo:uuid.mo/UUID";
+import Source "mo:uuid.mo/Source";
+import AsyncSource "mo:uuid.mo/async/SourceV4";
 import XorShift "mo:rand/XorShift";
 
 actor {

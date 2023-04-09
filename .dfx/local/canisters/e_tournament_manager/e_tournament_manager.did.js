@@ -1,14 +1,11 @@
 export const idlFactory = ({ IDL }) => {
   const InitArgs = IDL.Record({
+    'allowedUsers' : IDL.Opt(IDL.Vec(IDL.Principal)),
+    'auth' : IDL.Vec(IDL.Principal),
     'admins' : IDL.Vec(IDL.Principal),
     'environment' : IDL.Text,
+    'gameServers' : IDL.Vec(IDL.Principal),
   });
-  const Error = IDL.Variant({
-    'NonExistentTournament' : IDL.Null,
-    'NotAuthorized' : IDL.Null,
-    'NonExistentCanister' : IDL.Null,
-  });
-  const Result_4 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const Status = IDL.Variant({
     'OnHold' : IDL.Null,
     'Active' : IDL.Null,
@@ -44,6 +41,12 @@ export const idlFactory = ({ IDL }) => {
     'EmptyStats' : IDL.Null,
   });
   const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : TournamentError });
+  const Error__1 = IDL.Variant({
+    'NonExistentTournament' : IDL.Null,
+    'NotAuthorized' : IDL.Null,
+    'NonExistentCanister' : IDL.Null,
+  });
+  const Result_5 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error__1 });
   const TournamentSuccess = IDL.Record({
     'id' : IDL.Text,
     'status' : Status,
@@ -60,7 +63,7 @@ export const idlFactory = ({ IDL }) => {
     'externalCollections' : IDL.Vec(ExternalCollection),
     'startDate' : IDL.Text,
   });
-  const Result_3 = IDL.Variant({
+  const Result_4 = IDL.Variant({
     'ok' : IDL.Vec(TournamentSuccess),
     'err' : TournamentError,
   });
@@ -75,33 +78,58 @@ export const idlFactory = ({ IDL }) => {
       'externalResults' : IDL.Opt(IDL.Nat),
     }),
   });
-  const Result_2 = IDL.Variant({
+  const Result_3 = IDL.Variant({
     'ok' : IDL.Record({
       'leaderboard' : IDL.Vec(PlayerStatsSuccess),
       'rewards' : IDL.Text,
     }),
     'err' : TournamentError,
   });
-  const Result_1 = IDL.Variant({
+  const Result_2 = IDL.Variant({
     'ok' : TournamentSuccess,
     'err' : TournamentError,
   });
-  const anon_class_29_1 = IDL.Service({
-    'addNewAdmin' : IDL.Func([IDL.Vec(IDL.Principal)], [Result_4], []),
+  const RequestArgs = IDL.Variant({
+    'Add' : IDL.Vec(IDL.Principal),
+    'IsIn' : IDL.Principal,
+    'Remove' : IDL.Principal,
+    'RemoveAll' : IDL.Null,
+    'GetAll' : IDL.Null,
+    'IsCallerIn' : IDL.Null,
+  });
+  const AuthArgs = IDL.Variant({
+    'Auth' : RequestArgs,
+    'GameServer' : RequestArgs,
+    'Admin' : RequestArgs,
+    'AllowedUsers' : RequestArgs,
+  });
+  const Error = IDL.Variant({
+    'NotAuthorized' : IDL.Null,
+    'NonExistentRole' : IDL.Null,
+  });
+  const Result_1 = IDL.Variant({
+    'ok' : IDL.Opt(IDL.Vec(IDL.Principal)),
+    'err' : Error,
+  });
+  const anon_class_30_1 = IDL.Service({
     'addTournament' : IDL.Func([TournamentArgs], [Result], []),
     'deleteTournament' : IDL.Func([IDL.Text], [Result], []),
-    'endTournament' : IDL.Func([IDL.Text], [Result_4], []),
-    'getAllTournaments' : IDL.Func([], [Result_3], ['query']),
-    'getLeaderboard' : IDL.Func([IDL.Text], [Result_2], []),
-    'getTournament' : IDL.Func([IDL.Text], [Result_1], ['query']),
+    'endTournament' : IDL.Func([IDL.Text], [Result_5], []),
+    'getAllTournaments' : IDL.Func([], [Result_4], ['query']),
+    'getLeaderboard' : IDL.Func([IDL.Text], [Result_3], []),
+    'getTournament' : IDL.Func([IDL.Text], [Result_2], ['query']),
+    'manageAuth' : IDL.Func([AuthArgs], [Result_1], []),
     'updateTournament' : IDL.Func([TournamentArgs, IDL.Text], [Result], []),
   });
-  return anon_class_29_1;
+  return anon_class_30_1;
 };
 export const init = ({ IDL }) => {
   const InitArgs = IDL.Record({
+    'allowedUsers' : IDL.Opt(IDL.Vec(IDL.Principal)),
+    'auth' : IDL.Vec(IDL.Principal),
     'admins' : IDL.Vec(IDL.Principal),
     'environment' : IDL.Text,
+    'gameServers' : IDL.Vec(IDL.Principal),
   });
   return [InitArgs];
 };

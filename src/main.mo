@@ -12,27 +12,29 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Trie "mo:base/Trie";
 import TrieMap "mo:base/TrieMap";
-import Source "mo:uuid/async/SourceV4";
-import UUID "mo:uuid/UUID";
+import Source "mo:uuid.mo/async/SourceV4";
+import UUID "mo:uuid.mo/UUID";
 
 import IT "./initTypes";
 import OT "./opsTypes";
-import FullRels "./Rels/fullRels";
-import Rels "./Rels/Rels";
+import FullRels "./modules/FullRels";
+import Rels "./modules/Rels";
 import ST "./stableTypes";
 import U "./utils";
 import AID "./utils/Account";
 import Hex "./utils/Hex";
+import Auth "./modules/Auth";
 
 import CanIds "../canister-ids";
 
 shared ({ caller = owner }) actor class (
-  initOptions : IT.InitArgs,
+  initArgs : IT.InitArgs,
 ) = eTournamentManager {
 
-  stable let environment : Text = initOptions.environment;
+  stable let environment : Text = initArgs.environment;
 
-  stable var admins : [Principal] = initOptions.admins;
+  stable var authState = Auth.init(initArgs);
+  // stable var admins : [Principal] = initOptions.admins;
 
   stable var tournaments : Trie.Trie<Text, ST.Tournament> = Trie.empty();
 
@@ -44,7 +46,7 @@ shared ({ caller = owner }) actor class (
   );
 
   //This could be replaced with a Trie2D for multiple tournaments at the same time.
-  var initPlayersStats : Trie.Trie<Principal, IT.PlayerStats> = Trie.empty();
+  var initPlayersStats : Trie.Trie<Principal, OT.PlayerStats> = Trie.empty();
 
   public query func getAllTournaments() : async Result.Result<[OT.TournamentSuccess], OT.TournamentError> {
 
@@ -76,7 +78,7 @@ shared ({ caller = owner }) actor class (
 
   public query ({ caller }) func getTournament(tournamentId : Text) : async Result.Result<OT.TournamentSuccess, OT.TournamentError> {
 
-    if (not U.isAdmin(caller, admins)) {
+    if (not U.isAdmin(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -85,7 +87,7 @@ shared ({ caller = owner }) actor class (
 
   public shared ({ caller }) func updateTournament(tournamentArgs : OT.TournamentArgs, tournamentId : Text) : async Result.Result<(), OT.TournamentError> {
 
-    if (not U.isAdmin(caller, admins)) {
+    if (not U.isAdmin(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -131,7 +133,7 @@ shared ({ caller = owner }) actor class (
 
   public shared ({ caller }) func addTournament(tournamentArgs : OT.TournamentArgs) : async Result.Result<(), OT.TournamentError> {
 
-    if (not U.isAdmin(caller, admins)) {
+    if (not U.isAdmin(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -151,7 +153,7 @@ shared ({ caller = owner }) actor class (
 
   public shared ({ caller }) func deleteTournament(tournamentId : Text) : async Result.Result<(), OT.TournamentError> {
 
-    if (not U.isAdmin(caller, admins)) {
+    if (not U.isAdmin(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -160,7 +162,7 @@ shared ({ caller = owner }) actor class (
 
   public shared ({ caller }) func endTournament(tournamentId : Text) : async Result.Result<(), OT.Error> {
 
-    if (not U.isAdmin(caller, admins)) {
+    if (not U.isAdmin(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -176,66 +178,6 @@ shared ({ caller = owner }) actor class (
         ignore _changeStatus(tournamentId, #Finished);
 
         #ok(());
-      };
-      case (#err(e)) {
-        #err(e);
-      };
-    };
-  };
-
-  private func _getHotLeaderboard(tournamentId : Text) : async Result.Result<[(Text, Principal, ST.TournamentPlayerStats)], OT.Error> {
-    
-    let tournamentRes = _getTournament(tournamentId);
-    let tempTournamentPlayerStats : Buffer.Buffer<(Text, Principal, ST.TournamentPlayerStats)> = Buffer.Buffer(1);
-
-    switch (tournamentRes) {
-      case (#ok(tournament)) {
-        let internalStatsRes = await getInternalStats();
-        switch (internalStatsRes) {
-          case (#ok(internalStats)) {
-            var fullStats : [OT.PlayerStatsSuccess] = [{
-              points = {
-                internalResults = ?0;
-                externalResults = ?0;
-              };
-              earned = 0;
-              lost = 0;
-              matchesWon = 0;
-              matchesLost = 0;
-              principal = Principal.fromText("2vxsx-fae");
-            }];
-
-            if (tournament.externalCollections.size() != 0) {
-              fullStats := await getFullStats(
-                internalStats,
-                tournament.points,
-                tournament.externalCollections,
-              );
-            } else {
-              fullStats := internalStats;
-            };
-
-            for (stats in fullStats.vals()) {
-
-              tempTournamentPlayerStats.add(
-                tournamentId,
-                stats.principal,
-                {
-                  points = stats.points;
-                  earned = stats.earned;
-                  lost = stats.lost;
-                  matchesWon = stats.matchesWon;
-                  matchesLost = stats.matchesLost;
-                },
-              );
-            };
-
-            #ok(Buffer.toArray(tempTournamentPlayerStats));
-          };
-          case (#err(e)) {
-            #err(e);
-          };
-        };
       };
       case (#err(e)) {
         #err(e);
@@ -306,25 +248,77 @@ shared ({ caller = owner }) actor class (
 
   };
 
-  public shared ({ caller }) func addNewAdmin(principals : [Principal]) : async Result.Result<(), OT.Error> {
+//-------------------Authentication
 
-    if (not U.isAdmin(caller, admins)) {
-      return #err(#NotAuthorized);
+    public shared({caller}) func manageAuth (authArgs : Auth.AuthArgs) : async Result.Result<?[Principal], Auth.Error> {
+        
+        if(not Auth.isAuthorized(caller, authState.admins)) {
+            return #err(#NotAuthorized);
+        };
+
+        #ok(Auth.manageAuth(authArgs, caller, authState));
     };
 
-    let adminsBuff : Buffer.Buffer<Principal> = Buffer.Buffer(0);
+//-------------------Private Methods
 
-    for (admin in admins.vals()) {
-      adminsBuff.add(admin);
+  private func _getHotLeaderboard(tournamentId : Text) : async Result.Result<[(Text, Principal, ST.TournamentPlayerStats)], OT.Error> {
+    
+    let tournamentRes = _getTournament(tournamentId);
+    let tempTournamentPlayerStats : Buffer.Buffer<(Text, Principal, ST.TournamentPlayerStats)> = Buffer.Buffer(1);
+
+    switch (tournamentRes) {
+      case (#ok(tournament)) {
+        let internalStatsRes = await getInternalStats();
+        switch (internalStatsRes) {
+          case (#ok(internalStats)) {
+            var fullStats : [OT.PlayerStatsSuccess] = [{
+              points = {
+                internalResults = ?0;
+                externalResults = ?0;
+              };
+              earned = 0;
+              lost = 0;
+              matchesWon = 0;
+              matchesLost = 0;
+              principal = Principal.fromText("2vxsx-fae");
+            }];
+
+            if (tournament.externalCollections.size() != 0) {
+              fullStats := await getFullStats(
+                internalStats,
+                tournament.points,
+                tournament.externalCollections,
+              );
+            } else {
+              fullStats := internalStats;
+            };
+
+            for (stats in fullStats.vals()) {
+
+              tempTournamentPlayerStats.add(
+                tournamentId,
+                stats.principal,
+                {
+                  points = stats.points;
+                  earned = stats.earned;
+                  lost = stats.lost;
+                  matchesWon = stats.matchesWon;
+                  matchesLost = stats.matchesLost;
+                },
+              );
+            };
+
+            #ok(Buffer.toArray(tempTournamentPlayerStats));
+          };
+          case (#err(e)) {
+            #err(e);
+          };
+        };
+      };
+      case (#err(e)) {
+        #err(e);
+      };
     };
-
-    for (principal in principals.vals()) {
-      adminsBuff.add(principal);
-    };
-
-    admins := Buffer.toArray(adminsBuff);
-    return #ok(());
-
   };
 
   private func _deleteTournament(tournamentId : Text) : Result.Result<(), OT.TournamentError> {
@@ -479,11 +473,11 @@ shared ({ caller = owner }) actor class (
 
   };
 
-  private func getPlayersStats() : async Result.Result<[(Principal, IT.PlayerStats)], OT.Error> {
+  private func getPlayersStats() : async Result.Result<[(Principal, OT.PlayerStats)], OT.Error> {
     switch (CanIds.getCanId("eBRServiceCanId", environment)) {
       case (#ok(eBRServiceCanId)) {
         let bountyRushService = actor (eBRServiceCanId) : actor {
-          getPStatsOrderedByPoints : query () -> async ([(Principal, IT.PlayerStats)]);
+          getPStatsOrderedByPoints : query () -> async ([(Principal, OT.PlayerStats)]);
         };
             
         var playerPointsResult = await bountyRushService.getPStatsOrderedByPoints();
