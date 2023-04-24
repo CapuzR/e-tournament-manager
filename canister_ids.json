@@ -1,12 +1,22 @@
 {
   "e_asset_manager": {
     "ic": "",
-    "staging": "",
+    "staging": "bme3e-ryaaa-aaaan-qagda-cai",
     "local": "rno2w-sqaaa-aaaaa-aaacq-cai"
   },
   "e_tournament_manager": {
     "ic": "",
+    "staging": "4psib-waaaa-aaaan-qa45q-cai",
+    "local": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+  },
+  "icp_ledger": {
+    "ic": "",
     "staging": "",
-    "local": ""
+    "local": "rrkah-fqaaa-aaaaa-aaaaq-cai"
+  },
+  "e_br_service": {
+    "ic": "teh3c-4iaaa-aaaan-qa2hq-cai",
+    "staging": "x6h7n-bqaaa-aaaan-qajxq-cai",
+    "local": "r7inp-6aaaa-aaaaa-aaabq-cai"
   }
 }

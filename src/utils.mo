@@ -20,8 +20,8 @@ module {
   };
   
     public func compareInternalPlayerStats(
-        x : OT.PlayerStatsSuccess, 
-        y : OT.PlayerStatsSuccess
+        y : OT.PlayerStatsSuccess, 
+        x : OT.PlayerStatsSuccess
         ) : { #less; #equal; #greater } {
         let internalResX = Option.get(x.points.internalResults, 0);
         let internalResY = Option.get(y.points.internalResults, 0);

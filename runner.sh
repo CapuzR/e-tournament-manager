@@ -67,7 +67,7 @@ if [ $INSTALL_MODE = "none" ]
 then
     dfx canister install --network $E_TOURNAMENT_MANAGER_ENV e_tournament_manager --argument '(
         record { 
-            admins = vec {
+            admins = opt vec {
                 principal "'$ADMINS_PRINCIPAL_0'";
                 principal "'$ADMINS_PRINCIPAL_1'";
                 principal "'$TURN_MANAGER_PRINCIPAL_0'"
@@ -78,7 +78,7 @@ then
 else
     dfx canister install --mode $INSTALL_MODE --network $E_TOURNAMENT_MANAGER_ENV e_tournament_manager --argument '(
         record {
-            admins = vec {
+            admins = opt vec {
                 principal "'$ADMINS_PRINCIPAL_0'";
                 principal "'$ADMINS_PRINCIPAL_1'";
                 principal "'$TURN_MANAGER_PRINCIPAL_0'"
@@ -91,3 +91,22 @@ fi
 
 
 dfx generate e_tournament_manager
+
+            # auth = null;
+            # gameServers = null;
+            # allowedUsers = null;
+# dfx canister install --mode upgrade --network staging e_tournament_manager --argument '(
+#         record {
+#             admins = opt vec {
+#                 principal "ircn7-g7maa-v2zab-fgz7m-ofkss-eeskj-msyir-alras-riu7w-k5wrm-xqe";
+#                 principal "wnkwv-wdqb5-7wlzr-azfpw-5e5n5-dyxrf-uug7x-qxb55-mkmpa-5jqik-tqe";
+#                 principal "cygpo-4nsne-nbahj-py2bk-i7mw7-b4wht-iywa5-kdgxz-wvlxy-q64zn-qqe";
+#                 principal "l375p-dl5gr-4jcf7-5eir6-yssvr-owlxl-o2jnf-7mv5l-656lh-d2goc-tae"
+#             };
+#             environment = "staging"
+#         }
+#     )'
+
+# 3. Subir y probar módulo de Tournaments. LISTO
+# 4. Subir y probar módulo de Assets.
+# 5. Generar script para tener las cartas correctas en el AssetManager.

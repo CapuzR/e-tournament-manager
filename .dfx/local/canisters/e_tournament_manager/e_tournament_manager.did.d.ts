@@ -2,8 +2,8 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
 export type AuthArgs = { 'Auth' : RequestArgs } |
-  { 'GameServer' : RequestArgs } |
   { 'Admin' : RequestArgs } |
+  { 'GameServers' : RequestArgs } |
   { 'AllowedUsers' : RequestArgs };
 export type Error = { 'NotAuthorized' : null } |
   { 'NonExistentRole' : null };
@@ -13,10 +13,10 @@ export type Error__1 = { 'NonExistentTournament' : null } |
 export interface ExternalCollection { 'id' : string, 'name' : string }
 export interface InitArgs {
   'allowedUsers' : [] | [Array<Principal>],
-  'auth' : Array<Principal>,
-  'admins' : Array<Principal>,
+  'auth' : [] | [Array<Principal>],
+  'admins' : [] | [Array<Principal>],
   'environment' : string,
-  'gameServers' : Array<Principal>,
+  'gameServers' : [] | [Array<Principal>],
 }
 export interface InternalCollection { 'id' : string, 'name' : string }
 export interface PlayerStatsSuccess {
@@ -50,6 +50,8 @@ export type Result_4 = { 'ok' : Array<TournamentSuccess> } |
   { 'err' : TournamentError };
 export type Result_5 = { 'ok' : null } |
   { 'err' : Error__1 };
+export type Result_6 = { 'ok' : string } |
+  { 'err' : TournamentError };
 export type Status = { 'OnHold' : null } |
   { 'Active' : null } |
   { 'Finished' : null } |
@@ -95,7 +97,7 @@ export interface TournamentSuccess {
   'startDate' : string,
 }
 export interface anon_class_30_1 {
-  'addTournament' : ActorMethod<[TournamentArgs], Result>,
+  'addTournament' : ActorMethod<[TournamentArgs], Result_6>,
   'deleteTournament' : ActorMethod<[string], Result>,
   'endTournament' : ActorMethod<[string], Result_5>,
   'getAllTournaments' : ActorMethod<[], Result_4>,

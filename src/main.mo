@@ -78,7 +78,7 @@ shared ({ caller = owner }) actor class (
 
   public query ({ caller }) func getTournament(tournamentId : Text) : async Result.Result<OT.TournamentSuccess, OT.TournamentError> {
 
-    if (not U.isAdmin(caller, authState.admins)) {
+    if (not Auth.isAuthorized(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -87,7 +87,7 @@ shared ({ caller = owner }) actor class (
 
   public shared ({ caller }) func updateTournament(tournamentArgs : OT.TournamentArgs, tournamentId : Text) : async Result.Result<(), OT.TournamentError> {
 
-    if (not U.isAdmin(caller, authState.admins)) {
+    if (not Auth.isAuthorized(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -131,9 +131,9 @@ shared ({ caller = owner }) actor class (
     };
   };
 
-  public shared ({ caller }) func addTournament(tournamentArgs : OT.TournamentArgs) : async Result.Result<(), OT.TournamentError> {
+  public shared ({ caller }) func addTournament(tournamentArgs : OT.TournamentArgs) : async Result.Result<Text, OT.TournamentError> {
 
-    if (not U.isAdmin(caller, authState.admins)) {
+    if (not Auth.isAuthorized(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -146,14 +146,14 @@ shared ({ caller = owner }) actor class (
       };
       case (#ok) {
         ignore await _initTournament();
-        #ok();
+        #ok(tournamentId);
       };
     };
   };
 
   public shared ({ caller }) func deleteTournament(tournamentId : Text) : async Result.Result<(), OT.TournamentError> {
 
-    if (not U.isAdmin(caller, authState.admins)) {
+    if (not Auth.isAuthorized(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -162,7 +162,7 @@ shared ({ caller = owner }) actor class (
 
   public shared ({ caller }) func endTournament(tournamentId : Text) : async Result.Result<(), OT.Error> {
 
-    if (not U.isAdmin(caller, authState.admins)) {
+    if (not Auth.isAuthorized(caller, authState.admins)) {
       return #err(#NotAuthorized);
     };
 
@@ -211,9 +211,8 @@ shared ({ caller = owner }) actor class (
             return #err(#TournamentHasBeingCanceled);
           };
           case (#Active) {
-
+            Debug.print("Entra en getLeaderboard Active");
             var tournamentPlayerStatsEntries = await _getHotLeaderboard(tournamentId);
-
             switch (tournamentPlayerStatsEntries) {
               case (#ok(fullStats)) {
                 for (pS in fullStats.vals()) {
@@ -398,8 +397,8 @@ shared ({ caller = owner }) actor class (
               };
               case (?initStatsPlayers) {
                 continue l;
-              };
-            };
+              }
+            }
           };
           //When we have timer this will be necessary
           // _changeStatus(tournamentId, #Active);
@@ -470,7 +469,6 @@ shared ({ caller = owner }) actor class (
         });
       };
     };
-
   };
 
   private func getPlayersStats() : async Result.Result<[(Principal, OT.PlayerStats)], OT.Error> {
@@ -497,7 +495,7 @@ shared ({ caller = owner }) actor class (
       case (#ok(endStats)) {
         let internalResultsBuff : Buffer.Buffer<OT.PlayerStatsSuccess> = Buffer.Buffer(1);
 
-        for (eS in endStats.vals()) {
+        label eSf for (eS in endStats.vals()) {
           let initPSRes = Trie.find(
             initPlayersStats,
             U.key(eS.0),
@@ -506,6 +504,10 @@ shared ({ caller = owner }) actor class (
 
           switch (initPSRes) {
             case (null) {
+              Debug.print("Todos deberían entrar aquí?");
+              if (eS.1.points == 0) {
+                continue eSf;
+              };
               internalResultsBuff.add({
                 eS.1 with principal = eS.0;
                 points = {
@@ -515,9 +517,11 @@ shared ({ caller = owner }) actor class (
               });
             };
             case (?initPS) {
+              Debug.print("Case:");
+              Debug.print(debug_show(initPS));
               var points = 0;
-              if (eS.1.points <= initPS.points or eS.1.points == 0) {
-                points := 0;
+              if (eS.1.points <= initPS.points or eS.1.points == 0 or initPS.points == 0) {
+                continue eSf;
               } else {
                 points := eS.1.points - initPS.points;
               };

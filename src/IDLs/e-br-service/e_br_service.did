@@ -1,0 +1,466 @@
+type anon_class_36_1 = 
+ service {
+   backup: () -> (Result_7);
+   backupMatches: (nat, nat) -> (Result_7);
+   checkPayments: () -> (Result_8);
+   createMatch: (MatchInit) -> (Result_3);
+   endMatch: (text, vec EndMatchPlayerStats, nat) -> (Result);
+   forcedExit: (principal, text, TurnInit) -> (Result);
+   freePlayerFromMatch: (principal) -> (Result);
+   freePlayers: () -> (Result);
+   freePlayersFromMatch: (text) -> (Result);
+   fullBackup: () -> (Result_7);
+   getCanisterInfo: () -> (ContractInfo) query;
+   getDetailedCanisterInfo: () -> (Result_6);
+   getLogsAndClean: () -> (Result_5);
+   getPStatsOrderedByPoints: () ->
+    (vec record {
+           principal;
+           PlayerStats;
+         }) query;
+   getPlayerStats: (principal) -> (Result_4) query;
+   isCallerAllowed: () -> (bool);
+   joinMatch: (text) -> (Result_3);
+   manageAuth: (AuthArgs) -> (Result_2);
+   matchForcedClose: (text, TurnInit__1) -> (Result_1);
+   name: () -> (text) query;
+   startMatch: (text) -> (Result);
+   turnExec: (TurnInit) -> (Result);
+   wallet_balance: () -> (nat);
+   wallet_receive: () -> (record {accepted: nat64;});
+ };
+type TurnInit__1 = 
+ variant {
+   ForcedExit:
+    record {
+      detail:
+       variant {
+         Banned;
+         LeaveGame;
+         MatchClosed;
+         MultipleMatches;
+         TimeLimit;
+       };
+      "text": text;
+    };
+   OpenPot: BetOptions;
+   OpenRound: BetOptions;
+   RegularTurn: BetOptions;
+ };
+type TurnInit = 
+ variant {
+   ForcedExit:
+    record {
+      detail:
+       variant {
+         Banned;
+         LeaveGame;
+         MatchClosed;
+         MultipleMatches;
+         TimeLimit;
+       };
+      "text": text;
+    };
+   OpenPot: BetOptions;
+   OpenRound: BetOptions;
+   RegularTurn: BetOptions;
+ };
+type Tokens = record {e8s: nat64;};
+type TokenVerbose = 
+ record {
+   decimals: int;
+   meta: opt record {Issuer: text;};
+   symbol: text;
+ };
+type TokenSymbol = text;
+type Time = int;
+type Result_8 = 
+ variant {
+   err: Error;
+   ok: vec record {
+             amount: nat;
+             invoiceId: text;
+             isPaid: bool;
+           };
+ };
+type Result_7 = 
+ variant {
+   err: Error__1;
+   ok: GroupedData;
+ };
+type Result_6 = 
+ variant {
+   err: Error;
+   ok: ContractInfo;
+ };
+type Result_5 = 
+ variant {
+   err: Error;
+   ok: vec ErrorLog;
+ };
+type Result_4 = 
+ variant {
+   err: Error;
+   ok: PlayerStats;
+ };
+type Result_3 = 
+ variant {
+   err: Error;
+   ok: MatchInvoice;
+ };
+type Result_2 = 
+ variant {
+   err: Error__2;
+   ok: opt vec principal;
+ };
+type Result_1 = 
+ variant {
+   err: Error__1;
+   ok;
+ };
+type Result = 
+ variant {
+   err: Error;
+   ok;
+ };
+type RequestArgs = 
+ variant {
+   Add: vec principal;
+   GetAll;
+   IsCallerIn;
+   IsIn: principal;
+   Remove: principal;
+   RemoveAll;
+ };
+type PlayerStats__1 = 
+ record {
+   earned: nat;
+   lost: nat;
+   matchesLost: nat;
+   matchesWon: nat;
+   points: nat;
+ };
+type PlayerStats = 
+ record {
+   earned: nat;
+   lost: nat;
+   matchesLost: nat;
+   matchesWon: nat;
+   points: nat;
+ };
+type Payment = 
+ record {
+   amount: nat;
+   currentRound: nat;
+   paid: bool;
+   verifiedAtTime: opt Time;
+ };
+type MatchStatus = 
+ variant {
+   Cancelled;
+   Finished;
+   OnHold;
+   Playing;
+ };
+type MatchSettings = 
+ record {
+   fees: record {
+           bR: nat;
+           network: nat;
+         };
+   matchMaxBet: nat;
+   matchMinBet: nat;
+   maxNumPlayers: nat;
+   maxNumRounds: nat;
+   minNumPlayers: nat;
+   minNumRounds: nat;
+   pointsPerMatch: record {
+                     looser: nat;
+                     winner: nat;
+                   };
+   turnMinBet: nat;
+ };
+type MatchPlayerStatus = 
+ variant {
+   Active;
+   Banned;
+   Draw;
+   Exited;
+   Fold;
+   Looser;
+   MatchClosed;
+   MultipleMatches;
+   TimeBanned;
+   Winner;
+ };
+type MatchPlayerStats = 
+ record {
+   accumulatedBet: nat;
+   earned: nat;
+   invoiceId: text;
+   joinPosition: nat;
+   lost: nat;
+   matchId: text;
+   playerPrincipal: principal;
+   points: nat;
+   position: nat;
+   status: MatchPlayerStatus;
+ };
+type MatchInvoice = 
+ record {
+   accountId: AccountIdentifier;
+   invoiceId: text;
+ };
+type MatchInit = 
+ record {
+   details: opt Details;
+   externalMatchId: text;
+   maxBet: nat;
+   maxNumPlayers: nat;
+   minBet: nat;
+   rounds: nat;
+   tokenSymbol: TokenSymbol;
+ };
+type Match = 
+ record {
+   accumulatedBet: nat;
+   createdBy: principal;
+   createdOn: int;
+   currentBet: nat;
+   currentPlayer: opt principal;
+   currentRound: nat;
+   details: opt Details;
+   id: text;
+   joinedPlayersQty: nat;
+   maxBet: nat;
+   maxNumPlayers: nat;
+   minBet: nat;
+   pot: nat;
+   roundOpener: principal;
+   rounds: nat;
+   status: MatchStatus;
+   tokenSymbol: TokenSymbol;
+   updatedOn: int;
+ };
+type Invoice = 
+ record {
+   amount: nat;
+   amountPaid: nat;
+   createdBy: principal;
+   createdOn: Time;
+   details: opt Details;
+   expiration: Time;
+   id: text;
+   isPaidByPlayer: bool;
+   isPaidToPlayer: bool;
+   matchId: text;
+   matchPlayerAID: AccountIdentifier;
+   paidByPlayer: nat;
+   paidByPlayerVerifiedAtTime: opt Time;
+   paidToPlayer: nat;
+   paidToPlayerVerifiedAtTime: opt Time;
+   payments: opt vec Payment;
+   playerPaymentBlockHeight: BlockHeight;
+   toPlayerPaymentBlockHeight: BlockHeight;
+   token: TokenVerbose;
+   updatedOn: Time;
+ };
+type InitArgs = 
+ record {
+   admins: opt vec principal;
+   allowedUsers: opt vec principal;
+   auth: opt vec principal;
+   environment: text;
+   gameServers: opt vec principal;
+ };
+type GroupedData = 
+ record {
+   activePlayerMatches: vec record {
+                              principal;
+                              text;
+                            };
+   admins: opt vec principal;
+   allowedUsers: opt vec principal;
+   auth: opt vec principal;
+   errorLog: vec ErrorLog;
+   errorQty: ErrorQty;
+   externalInternalMatchIdEntries: vec record {
+                                         text;
+                                         text;
+                                       };
+   gameServers: opt vec principal;
+   invoices: vec record {
+                   text;
+                   Invoice;
+                 };
+   matchInvoiceEntries: vec record {
+                              text;
+                              text;
+                            };
+   matchPlayerStatsEntries: vec record {
+                                  text;
+                                  principal;
+                                  MatchPlayerStats;
+                                };
+   matchSettings: MatchSettings;
+   matches: vec record {
+                  text;
+                  Match;
+                };
+   playerStats: vec record {
+                      principal;
+                      PlayerStats__1;
+                    };
+   userInvoiceEntries: vec record {
+                             principal;
+                             text;
+                           };
+ };
+type Error__2 = 
+ variant {
+   NonExistentRole;
+   NotAuthorized;
+ };
+type Error__1 = 
+ variant {
+   AlreadyExists;
+   AlreadyJoined;
+   AlreadyPlaying;
+   AlreadyVerified: text;
+   BadFee: record {expected_fee: Tokens;};
+   BadParameters;
+   Expired;
+   InsufficientFunds: record {balance: Tokens;};
+   InvalidAID;
+   InvalidAccount: text;
+   InvalidAmount;
+   InvalidDetails;
+   InvalidInvoiceId;
+   InvalidToken;
+   NonExistentCanister;
+   NonExistentItem;
+   NotAuthorized;
+   NotFound;
+   NotInMatch;
+   NotPlayersTurn;
+   NotYetPaid: text;
+   TransferError;
+   TxCreatedInFuture;
+   TxDuplicate: record {duplicate_of: BlockHeight;};
+   TxTooOld: record {allowed_window_nanos: nat64;};
+   Unknown: text;
+ };
+type ErrorQty = 
+ record {
+   checkPaymentError: nat;
+   payToElementumError: nat;
+   payToWinnerError: nat;
+   transferToMatchError: nat;
+   updateInvoicePWError: nat;
+   updateInvoiceTMError: nat;
+ };
+type ErrorLogType = 
+ variant {
+   CheckPayment;
+   EPaymentMismatch;
+   PayToElementum;
+   PayToWinner;
+   TransferToMatch;
+   UpdateInvoice: text;
+ };
+type ErrorLog = 
+ record {
+   createdOn: Time;
+   error: Error__1;
+   invoiceId: text;
+   kind: ErrorLogType;
+   matchId: text;
+   player: principal;
+ };
+type Error = 
+ variant {
+   AlreadyExists;
+   AlreadyJoined;
+   AlreadyPlaying;
+   AlreadyVerified: text;
+   BadFee: record {expected_fee: Tokens;};
+   BadParameters;
+   Expired;
+   InsufficientFunds: record {balance: Tokens;};
+   InvalidAID;
+   InvalidAccount: text;
+   InvalidAmount;
+   InvalidDetails;
+   InvalidInvoiceId;
+   InvalidToken;
+   NonExistentCanister;
+   NonExistentItem;
+   NotAuthorized;
+   NotFound;
+   NotInMatch;
+   NotPlayersTurn;
+   NotYetPaid: text;
+   TransferError;
+   TxCreatedInFuture;
+   TxDuplicate: record {duplicate_of: BlockHeight;};
+   TxTooOld: record {allowed_window_nanos: nat64;};
+   Unknown: text;
+ };
+type EndMatchPlayerStats = 
+ record {
+   points: nat;
+   position: nat;
+   "principal": principal;
+ };
+type Details = 
+ record {
+   description: text;
+   meta: blob;
+ };
+type DetailValue = 
+ variant {
+   False;
+   Float: float64;
+   I64: int64;
+   Principal: principal;
+   Slice: vec nat8;
+   Text: text;
+   True;
+   U64: nat64;
+   Vec: vec DetailValue;
+ };
+type ContractInfo = 
+ record {
+   cycles: nat;
+   details: vec record {
+                  text;
+                  DetailValue;
+                };
+   heapSize: nat;
+   maxLiveSize: nat;
+   memorySize: nat;
+ };
+type BlockHeight = nat64;
+type BetOptions = 
+ variant {
+   AllInCall: record {amountBet: nat;};
+   AllInRaise: record {amountBet: nat;};
+   Call;
+   Check;
+   Fold;
+   Raise: record {amountBet: nat;};
+ };
+type AuthArgs = 
+ variant {
+   Admin: RequestArgs;
+   AllowedUsers: RequestArgs;
+   Auth: RequestArgs;
+   GameServers: RequestArgs;
+ };
+type AccountIdentifier = 
+ variant {
+   "blob": blob;
+   "principal": principal;
+   "text": text;
+ };
+service : (InitArgs) -> anon_class_36_1

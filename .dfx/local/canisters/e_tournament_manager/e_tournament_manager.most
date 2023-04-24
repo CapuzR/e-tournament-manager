@@ -37,10 +37,10 @@ type Trie<K, V> = {#branch : Branch<K, V>; #empty; #leaf : Leaf<K, V>};
 actor {
   stable var authState :
     {
-      var admins : [Principal];
+      var admins : ?[Principal];
       var allowedUsers : ?[Principal];
-      var auth : [Principal];
-      var gameServers : [Principal]
+      var auth : ?[Principal];
+      var gameServers : ?[Principal]
     };
   stable environment : Text;
   stable var stTournamentPlayerStats :

@@ -1,12 +1,12 @@
-type anon_class_29_1 = 
+type anon_class_30_1 = 
  service {
-   addNewAdmin: (vec principal) -> (Result_4);
-   addTournament: (TournamentArgs) -> (Result);
+   addTournament: (TournamentArgs) -> (Result_6);
    deleteTournament: (text) -> (Result);
-   endTournament: (text) -> (Result_4);
-   getAllTournaments: () -> (Result_3) query;
-   getLeaderboard: (text) -> (Result_2) query;
-   getTournament: (text) -> (Result_1) query;
+   endTournament: (text) -> (Result_5);
+   getAllTournaments: () -> (Result_4) query;
+   getLeaderboard: (text) -> (Result_3);
+   getTournament: (text) -> (Result_2) query;
+   manageAuth: (AuthArgs) -> (Result_1);
    updateTournament: (TournamentArgs, text) -> (Result);
  };
 type TournamentSuccess = 
@@ -34,6 +34,8 @@ type TournamentError =
    NonExistentTournament;
    NotAuthorized;
    TournamentAlreadyExists;
+   TournamentHasBeingCanceled;
+   TournamentHasntStarted;
    Unknown: text;
  };
 type TournamentArgs = 
@@ -59,17 +61,22 @@ type Status =
    Finished;
    OnHold;
  };
-type Result_4 = 
+type Result_6 = 
  variant {
-   err: Error;
+   err: TournamentError;
+   ok: text;
+ };
+type Result_5 = 
+ variant {
+   err: Error__1;
    ok;
  };
-type Result_3 = 
+type Result_4 = 
  variant {
    err: TournamentError;
    ok: vec TournamentSuccess;
  };
-type Result_2 = 
+type Result_3 = 
  variant {
    err: TournamentError;
    ok: record {
@@ -77,15 +84,29 @@ type Result_2 =
          rewards: text;
        };
  };
-type Result_1 = 
+type Result_2 = 
  variant {
    err: TournamentError;
    ok: TournamentSuccess;
+ };
+type Result_1 = 
+ variant {
+   err: Error;
+   ok: opt vec principal;
  };
 type Result = 
  variant {
    err: TournamentError;
    ok;
+ };
+type RequestArgs = 
+ variant {
+   Add: vec principal;
+   GetAll;
+   IsCallerIn;
+   IsIn: principal;
+   Remove: principal;
+   RemoveAll;
  };
 type PlayerStatsSuccess = 
  record {
@@ -106,18 +127,33 @@ type InternalCollection =
  };
 type InitArgs = 
  record {
-   admins: vec principal;
+   admins: opt vec principal;
+   allowedUsers: opt vec principal;
+   auth: opt vec principal;
    environment: text;
+   gameServers: opt vec principal;
  };
 type ExternalCollection = 
  record {
    id: text;
    name: text;
  };
-type Error = 
+type Error__1 = 
  variant {
    NonExistentCanister;
    NonExistentTournament;
    NotAuthorized;
  };
-service : (InitArgs) -> anon_class_29_1
+type Error = 
+ variant {
+   NonExistentRole;
+   NotAuthorized;
+ };
+type AuthArgs = 
+ variant {
+   Admin: RequestArgs;
+   AllowedUsers: RequestArgs;
+   Auth: RequestArgs;
+   GameServers: RequestArgs;
+ };
+service : (InitArgs) -> anon_class_30_1

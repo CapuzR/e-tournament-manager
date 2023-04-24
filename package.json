@@ -1,0 +1,42 @@
+{
+  "name": "e-tournament-manager",
+  "version": "0.0.1",
+  "description": "Elementum Tournament Manager",
+  "main": "index.js",
+  "dependencies": {
+    "@dfinity/candid": "^0.12.1",
+    "bip39": "^3.0.4",
+    "buffer-crc32": "^0.2.13",
+    "crypto-js": "^4.1.1",
+    "hdkey": "^2.0.1"
+  },
+  "devDependencies": {
+    "@dfinity/agent": "^0.12.1",
+    "@dfinity/identity": "^0.12.1",
+    "@dfinity/principal": "^0.12.1",
+    "isomorphic-fetch": "^3.0.0",
+    "prettier": "^2.7.1",
+    "prettier-plugin-motoko": "^0.2.0",
+    "vitest": "^0.29.7"
+  },
+  "scripts": {
+    "build": "webpack",
+    "prebuild": "npm run copy:types",
+    "prestart": "npm run copy:types",
+    "copy:types": "rsync -avr .dfx/$(echo ${DFX_NETWORK:-'**'})/canisters/** --exclude='assets/' --exclude='idl/' --exclude='*.wasm' --delete src/declarations",
+    "test": "vitest",
+    "start": "sh start.sh",
+    "ci": "vitest run",
+    "preci": "dfx stop; dfx start --background --clean; dfx canister create bountyRushService; npm run br; dfx generate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CapuzR/e-tournament-manager.git"
+  },
+  "author": "Ricardo Capuz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CapuzR/e-tournament-manager/issues"
+  },
+  "homepage": "https://github.com/CapuzR/e-tournament-manager#readme"
+}

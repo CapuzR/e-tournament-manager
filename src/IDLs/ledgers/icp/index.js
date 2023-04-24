@@ -1,11 +1,11 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 
 // Imports and re-exports candid interface
-import { idlFactory } from "./e_tournament_manager.did.js";
-export { idlFactory } from "./e_tournament_manager.did.js";
+import { idlFactory } from "./icp_ledger.did.js";
+export { idlFactory } from "./icp_ledger.did.js";
 
 // CANISTER_ID is replaced by webpack based on node environment
-export const canisterId = process.env.E_TOURNAMENT_MANAGER_CANISTER_ID;
+export const canisterId = process.env.ICP_LEDGER_CANISTER_ID;
 
 export const createActor = (canisterId, options = {}) => {
   const agent = options.agent || new HttpAgent({ ...options.agentOptions });
@@ -34,4 +34,4 @@ export const createActor = (canisterId, options = {}) => {
   });
 };
 
-export const e_tournament_manager = createActor(canisterId);
+export const icp_ledger = createActor(canisterId);

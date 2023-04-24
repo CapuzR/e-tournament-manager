@@ -1,10 +1,10 @@
 export const idlFactory = ({ IDL }) => {
   const InitArgs = IDL.Record({
     'allowedUsers' : IDL.Opt(IDL.Vec(IDL.Principal)),
-    'auth' : IDL.Vec(IDL.Principal),
-    'admins' : IDL.Vec(IDL.Principal),
+    'auth' : IDL.Opt(IDL.Vec(IDL.Principal)),
+    'admins' : IDL.Opt(IDL.Vec(IDL.Principal)),
     'environment' : IDL.Text,
-    'gameServers' : IDL.Vec(IDL.Principal),
+    'gameServers' : IDL.Opt(IDL.Vec(IDL.Principal)),
   });
   const Status = IDL.Variant({
     'OnHold' : IDL.Null,
@@ -40,6 +40,7 @@ export const idlFactory = ({ IDL }) => {
     'NonExistentCanister' : IDL.Null,
     'EmptyStats' : IDL.Null,
   });
+  const Result_6 = IDL.Variant({ 'ok' : IDL.Text, 'err' : TournamentError });
   const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : TournamentError });
   const Error__1 = IDL.Variant({
     'NonExistentTournament' : IDL.Null,
@@ -99,8 +100,8 @@ export const idlFactory = ({ IDL }) => {
   });
   const AuthArgs = IDL.Variant({
     'Auth' : RequestArgs,
-    'GameServer' : RequestArgs,
     'Admin' : RequestArgs,
+    'GameServers' : RequestArgs,
     'AllowedUsers' : RequestArgs,
   });
   const Error = IDL.Variant({
@@ -112,7 +113,7 @@ export const idlFactory = ({ IDL }) => {
     'err' : Error,
   });
   const anon_class_30_1 = IDL.Service({
-    'addTournament' : IDL.Func([TournamentArgs], [Result], []),
+    'addTournament' : IDL.Func([TournamentArgs], [Result_6], []),
     'deleteTournament' : IDL.Func([IDL.Text], [Result], []),
     'endTournament' : IDL.Func([IDL.Text], [Result_5], []),
     'getAllTournaments' : IDL.Func([], [Result_4], ['query']),
@@ -126,10 +127,10 @@ export const idlFactory = ({ IDL }) => {
 export const init = ({ IDL }) => {
   const InitArgs = IDL.Record({
     'allowedUsers' : IDL.Opt(IDL.Vec(IDL.Principal)),
-    'auth' : IDL.Vec(IDL.Principal),
-    'admins' : IDL.Vec(IDL.Principal),
+    'auth' : IDL.Opt(IDL.Vec(IDL.Principal)),
+    'admins' : IDL.Opt(IDL.Vec(IDL.Principal)),
     'environment' : IDL.Text,
-    'gameServers' : IDL.Vec(IDL.Principal),
+    'gameServers' : IDL.Opt(IDL.Vec(IDL.Principal)),
   });
   return [InitArgs];
 };

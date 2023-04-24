@@ -1,6 +1,6 @@
 type anon_class_30_1 = 
  service {
-   addTournament: (TournamentArgs) -> (Result);
+   addTournament: (TournamentArgs) -> (Result_6);
    deleteTournament: (text) -> (Result);
    endTournament: (text) -> (Result_5);
    getAllTournaments: () -> (Result_4) query;
@@ -60,6 +60,11 @@ type Status =
    Canceled;
    Finished;
    OnHold;
+ };
+type Result_6 = 
+ variant {
+   err: TournamentError;
+   ok: text;
  };
 type Result_5 = 
  variant {
@@ -122,11 +127,11 @@ type InternalCollection =
  };
 type InitArgs = 
  record {
-   admins: vec principal;
+   admins: opt vec principal;
    allowedUsers: opt vec principal;
-   auth: vec principal;
+   auth: opt vec principal;
    environment: text;
-   gameServers: vec principal;
+   gameServers: opt vec principal;
  };
 type ExternalCollection = 
  record {
@@ -149,6 +154,6 @@ type AuthArgs =
    Admin: RequestArgs;
    AllowedUsers: RequestArgs;
    Auth: RequestArgs;
-   GameServer: RequestArgs;
+   GameServers: RequestArgs;
  };
 service : (InitArgs) -> anon_class_30_1

@@ -8,7 +8,7 @@ module {
         #Admin : RequestArgs;
         #Auth : RequestArgs;
         #AllowedUsers : RequestArgs;
-        #GameServer : RequestArgs;
+        #GameServers : RequestArgs;
     };
 
     public type Error = {
@@ -26,18 +26,18 @@ module {
     };
 
     public type InitArgs = {
-        admins : [Principal];
-        auth : [Principal];
+        admins : ?[Principal];
+        auth : ?[Principal];
         allowedUsers : ?[Principal];
-        gameServers : [Principal];
+        gameServers : ?[Principal];
         environment : Text;
     };
 
     public type State = {
-        var admins : [Principal];
-        var auth : [Principal];
+        var admins : ?[Principal];
+        var auth : ?[Principal];
         var allowedUsers : ?[Principal];
-        var gameServers : [Principal];
+        var gameServers : ?[Principal];
     };
 
     public type StateSuccess = {
@@ -48,7 +48,6 @@ module {
     };
 
     public func init (args : InitArgs) : State {
-
         let {
             admins;
             auth;
@@ -62,7 +61,6 @@ module {
             var allowedUsers;
             var gameServers;
         };
-
     };
     
     public func manageAuth (authArgs: AuthArgs, caller : Principal, authState : State) :  ?[Principal] {
@@ -74,15 +72,8 @@ module {
                         return null;
                     };
                     case (_) {
-                        switch (manageRequest(requestArgs, authState.admins, caller)) {
-                            case (null) {
-                                return null;
-                            };
-                            case (?res) {
-                                authState.admins := res;
-                                return ?res;
-                            };
-                        };
+                        authState.admins := manageRequest(requestArgs, authState.admins, caller);
+                        return authState.admins;
                     };
                 };
             };
@@ -92,51 +83,30 @@ module {
                         return null;
                     };
                     case (_) {
-                        switch (manageRequest(requestArgs, authState.auth, caller)) {
-                            case (null) {
-                                return null;
-                            };
-                            case (?res) {
-                                authState.auth := res;
-                                return ?res;
-                            };
-                        };
+                        authState.auth := manageRequest(requestArgs, authState.auth, caller);
+                        return authState.auth;
                     };
                 };
             };
             case (#AllowedUsers(requestArgs)) {
-                switch (manageRequest(requestArgs, Option.get(authState.allowedUsers, []), caller)) {
-                    case (null) {
-                        return null;
-                    };
-                    case (res) {
-                        authState.allowedUsers := res;
-                        return res;
-                    };
-                };
+                authState.allowedUsers := manageRequest(requestArgs, authState.allowedUsers, caller);
+                return authState.allowedUsers;
             };
-            case (#GameServer(requestArgs)) {
+            case (#GameServers(requestArgs)) {
                 switch (requestArgs) {
                     case (#RemoveAll) {
                         return null;
                     };
                     case (_) {
-                        switch (manageRequest(requestArgs, authState.gameServers, caller)) {
-                            case (null) {
-                                return null;
-                            };
-                            case (?res) {
-                                authState.gameServers := res;
-                                return ?res;
-                            };
-                        };
+                        authState.gameServers := manageRequest(requestArgs, authState.gameServers, caller);
+                        return authState.gameServers;
                     };
                 };
             };
         };
     };
     
-    private func manageRequest (requestArgs: RequestArgs, authArr : [Principal], caller : Principal) : ?[Principal] {
+    private func manageRequest (requestArgs: RequestArgs, authArr : ?[Principal], caller : Principal) : ?[Principal] {
 
         switch (requestArgs) {
             case ( #Add(principalsArr) ) {
@@ -160,12 +130,13 @@ module {
         };
     };
     
-    public func isAuthorized (principal: Principal, authArr : [Principal]) : Bool {
+    public func isAuthorized (principal: Principal, authArr : ?[Principal]) : Bool {
         _isIn(principal, authArr)
     };
 
-    private func remove (principal: Principal, authArr : [Principal]) : ?[Principal] {
-        let authBuff : Buffer.Buffer<Principal> = Buffer.fromArray(authArr);
+    private func remove (principal: Principal, authArr : ?[Principal]) : ?[Principal] {
+        let authA = Option.get(authArr, []);
+        let authBuff : Buffer.Buffer<Principal> = Buffer.fromArray(authA);
         switch(Buffer.indexOf<Principal>(principal, authBuff, func (p1 : Principal, p2 : Principal) { p1 == p2 })) {
             case (null) {};
             case (?index) {
@@ -175,15 +146,15 @@ module {
         ?Buffer.toArray(authBuff);
     };
     
-    private func getAll (authArr : [Principal]) : ?[Principal] {
-        ?authArr;
+    private func getAll (authArr : ?[Principal]) : ?[Principal] {
+        authArr;
     };
     
     private func removeAll () : ?[Principal] {
         null;
     };
     
-    private func isIn (principal: Principal, authArr : [Principal]) : ?[Principal] {
+    private func isIn (principal: Principal, authArr : ?[Principal]) : ?[Principal] {
         if(_isIn(principal, authArr)) {
             return ?[principal];
         } else {
@@ -191,23 +162,33 @@ module {
         }
     };
 
-    private func add (principalsArr: [Principal], authArr : [Principal]) : ?[Principal] {
+    private func add (principalsArr: [Principal], authArr : ?[Principal]) : ?[Principal] {
+
         let principalsBuff : Buffer.Buffer<Principal> = Buffer.Buffer(1);
-        let authBuff : Buffer.Buffer<Principal> = Buffer.fromArray(authArr);
-        
+
         for (principal in principalsArr.vals()) {
             if(not _isIn(principal, authArr)) {
                 principalsBuff.add(principal);
             };
         };
 
-        authBuff.append(principalsBuff);
-        return ?Buffer.toArray(authBuff);
+        switch (authArr) {
+            case (null) {
+                return ?Buffer.toArray(principalsBuff);
+            };
+            case (?authA) {
+                let authBuff : Buffer.Buffer<Principal> = Buffer.fromArray(authA);
+                authBuff.append(principalsBuff);
+                return ?Buffer.toArray(authBuff);
+            };
+        };
+        
 
     };
 
-    private func _isIn (principal: Principal, authArr : [Principal]) : Bool {
-        let authBuff : Buffer.Buffer<Principal> = Buffer.fromArray(authArr);
+    private func _isIn (principal: Principal, authArr : ?[Principal]) : Bool {
+        let authA = Option.get(authArr, []);
+        let authBuff : Buffer.Buffer<Principal> = Buffer.fromArray(authA);
         Buffer.contains<Principal>(authBuff, principal, func (p1 : Principal, p2 : Principal) { p1 == p2 })
     };
 
