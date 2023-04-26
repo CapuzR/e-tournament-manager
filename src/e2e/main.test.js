@@ -21,9 +21,26 @@ import { getAccountId } from "./Utils/account";
     describe('Tournaments', () => {
         beforeEach(async () => {
 
+            let rewardObj = {
+                partner: "BTC Flower",
+                general: "30 ICP + 10 Dugrosk + 100",
+                position1: {
+                    name: "10 ICP + 5 Dugrosk + 50 Hollow's End",
+                    url: "https://toniq.io/marketplace/hallows-end"
+                },
+                position2: {
+                    name: "10 ICP + 3 Dugrosk + 30 Hollow's End",
+                    url: "https://toniq.io/marketplace/hallows-end"
+                },
+                position3: {
+                    name: "10 ICP + 2 Dugrosk + 20 Hollow's End",
+                    url: "https://toniq.io/marketplace/hallows-end"
+                }
+            };
+
             let tournamentArgs = {
                 status: { "Active": null },
-                reward: "10",
+                reward: JSON.stringify(rewardObj),
                 endDate: (Date.now() + 1800).toString(),
                 dynamicExplanation: "Test",
                 game: "Bounty Rush",
@@ -52,7 +69,7 @@ import { getAccountId } from "./Utils/account";
 
             let tournamentArgs1 = {
                 status: { "Active": null },
-                reward: "10",
+                reward: JSON.stringify(rewardObj),
                 endDate: (Date.now() + 1800).toString(),
                 dynamicExplanation: "Test",
                 game: "Bounty Rush",
