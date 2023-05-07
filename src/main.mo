@@ -176,6 +176,7 @@ shared ({ caller = owner }) actor class (
         };
 
         ignore _changeStatus(tournamentId, #Finished);
+        initPlayersStats := Trie.empty();
 
         #ok(());
       };
@@ -211,7 +212,6 @@ shared ({ caller = owner }) actor class (
             return #err(#TournamentHasBeingCanceled);
           };
           case (#Active) {
-            Debug.print("Entra en getLeaderboard Active");
             var tournamentPlayerStatsEntries = await _getHotLeaderboard(tournamentId);
             switch (tournamentPlayerStatsEntries) {
               case (#ok(fullStats)) {

@@ -8,7 +8,7 @@
     "networks": {
       "staging": {
         "providers": [
-            "https://icp0.io"
+            "https://ic0.app"
         ],
         "type": "persistent"
     }
