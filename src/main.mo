@@ -14,7 +14,10 @@ import Trie "mo:base/Trie";
 import TrieMap "mo:base/TrieMap";
 import Source "mo:uuid.mo/async/SourceV4";
 import UUID "mo:uuid.mo/UUID";
-
+// import DateTime "mo:motoko-datetime";
+import {DAY; HOUR; WEEK;} "mo:time-consts";
+import Timer "mo:base/Timer";
+import Time "mo:base/Time";
 import IT "./initTypes";
 import OT "./opsTypes";
 import FullRels "./modules/FullRels";
@@ -30,6 +33,8 @@ import CanIds "../canister-ids";
 shared ({ caller = owner }) actor class (
   initArgs : IT.InitArgs,
 ) = eTournamentManager {
+
+  type Time = Time.Time;
 
   stable let environment : Text = initArgs.environment;
 
@@ -146,6 +151,22 @@ shared ({ caller = owner }) actor class (
       };
       case (#ok) {
         ignore await _initTournament();
+
+        let time = Timer.recurringTimer(#seconds WEEK, func () : async () {
+            switch(_changeStatus(tournamentId, #Finished)){
+              case(#err(e)){
+                switch (e) {
+                   case (_) {
+                     return ();
+                   };
+                 };
+              };
+              case(#ok(_)){
+                return ();
+              };
+            }
+          });
+
         #ok(tournamentId);
       };
     };
@@ -175,7 +196,6 @@ shared ({ caller = owner }) actor class (
           tournamentPlayerStats.put(stats);
         };
 
-        ignore _changeStatus(tournamentId, #Finished);
         initPlayersStats := Trie.empty();
 
         #ok(());
@@ -259,6 +279,11 @@ shared ({ caller = owner }) actor class (
     };
 
 //-------------------Private Methods
+
+//-------Timer
+///{
+
+///}
 
   private func _getHotLeaderboard(tournamentId : Text) : async Result.Result<[(Text, Principal, ST.TournamentPlayerStats)], OT.Error> {
     
@@ -400,8 +425,6 @@ shared ({ caller = owner }) actor class (
               }
             }
           };
-          //When we have timer this will be necessary
-          // _changeStatus(tournamentId, #Active);
           return #ok(());
         } else {
           return #err(#EmptyStats);
@@ -443,6 +466,22 @@ shared ({ caller = owner }) actor class (
     switch (exists) {
       case null {
         tournaments := newTournaments;
+
+          let time = Timer.recurringTimer(#seconds DAY, func () : async () {
+            switch(_changeStatus(tournamentId, #Active)){
+              case(#err(e)){
+                switch (e) {
+                   case (_) {
+                     return ();
+                   };
+                 };
+              };
+              case(#ok(_)){
+                return ();
+              };
+            }
+          });
+
         #ok(());
       };
       case (?cc) {

@@ -1,0 +1,14 @@
+{
+  "name": "wasm",
+  "collaborators": [
+    "Ryan Vandersmith <ryan.vandersmith@dfinity.org>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "wasm_bg.wasm",
+    "wasm.js",
+    "wasm.d.ts"
+  ],
+  "main": "wasm.js",
+  "types": "wasm.d.ts"
+}

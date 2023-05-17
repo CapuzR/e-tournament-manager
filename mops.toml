@@ -1,3 +1,5 @@
 [dependencies]
-base = "0.7.4"
+base = "0.8.7"
 "uuid.mo" = "https://github.com/aviate-labs/uuid.mo#v0.2.1"
+time-consts = "1.0.1"
+motoko-datetime = "https://github.com/ByronBecker/motoko-datetime#master"

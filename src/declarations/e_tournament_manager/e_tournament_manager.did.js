@@ -112,7 +112,7 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Opt(IDL.Vec(IDL.Principal)),
     'err' : Error,
   });
-  const anon_class_30_1 = IDL.Service({
+  const anon_class_33_1 = IDL.Service({
     'addTournament' : IDL.Func([TournamentArgs], [Result_6], []),
     'deleteTournament' : IDL.Func([IDL.Text], [Result], []),
     'endTournament' : IDL.Func([IDL.Text], [Result_5], []),
@@ -122,7 +122,7 @@ export const idlFactory = ({ IDL }) => {
     'manageAuth' : IDL.Func([AuthArgs], [Result_1], []),
     'updateTournament' : IDL.Func([TournamentArgs, IDL.Text], [Result], []),
   });
-  return anon_class_30_1;
+  return anon_class_33_1;
 };
 export const init = ({ IDL }) => {
   const InitArgs = IDL.Record({

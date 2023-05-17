@@ -1,4 +1,4 @@
-type anon_class_30_1 = 
+type anon_class_33_1 = 
  service {
    addTournament: (TournamentArgs) -> (Result_6);
    deleteTournament: (text) -> (Result);
@@ -156,4 +156,4 @@ type AuthArgs =
    Auth: RequestArgs;
    GameServers: RequestArgs;
  };
-service : (InitArgs) -> anon_class_30_1
+service : (InitArgs) -> anon_class_33_1

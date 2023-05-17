@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../src/parsers/motoko-tt-parse/index.ts"],"names":[],"mappings":";;;;;;AACA,gEAA6D;AAC7D,yCAA8C;AAC9C,oDAA4B;AAEf,QAAA,eAAe,GAAG,iBAAiB,CAAC;AAEjD,MAAM,MAAM,GAAW;IACnB,SAAS,EAAE,6BAAa;IACxB,KAAK,EAAL,eAAK;IACL,QAAQ,EAAR,mBAAQ;IACR,MAAM,EAAN,iBAAM;CACT,CAAC;AAEF,kBAAe,MAAM,CAAC"}

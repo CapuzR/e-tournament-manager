@@ -96,7 +96,7 @@ export interface TournamentSuccess {
   'externalCollections' : Array<ExternalCollection>,
   'startDate' : string,
 }
-export interface anon_class_30_1 {
+export interface anon_class_33_1 {
   'addTournament' : ActorMethod<[TournamentArgs], Result_6>,
   'deleteTournament' : ActorMethod<[string], Result>,
   'endTournament' : ActorMethod<[string], Result_5>,
@@ -106,4 +106,4 @@ export interface anon_class_30_1 {
   'manageAuth' : ActorMethod<[AuthArgs], Result_1>,
   'updateTournament' : ActorMethod<[TournamentArgs, string], Result>,
 }
-export interface _SERVICE extends anon_class_30_1 {}
+export interface _SERVICE extends anon_class_33_1 {}
