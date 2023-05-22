@@ -1,13 +1,19 @@
-type anon_class_33_1 = 
+type anon_class_35_1 = 
  service {
-   addTournament: (TournamentArgs) -> (Result_6);
-   deleteTournament: (text) -> (Result);
-   endTournament: (text) -> (Result_5);
-   getAllTournaments: () -> (Result_4) query;
-   getLeaderboard: (text) -> (Result_3);
-   getTournament: (text) -> (Result_2) query;
-   manageAuth: (AuthArgs) -> (Result_1);
-   updateTournament: (TournamentArgs, text) -> (Result);
+   addTournament: (TournamentArgs) -> (Result_10);
+   createProposal: (text, text) -> (Result_1);
+   deleteProposal: (text) -> (Result);
+   deleteTournament: (text) -> (Result_2);
+   endTournament: (text) -> (Result_9);
+   getAllProposals: () -> (Result_8);
+   getAllTournaments: () -> (Result_7) query;
+   getLeaderboard: (text) -> (Result_6);
+   getProposal: (text) -> (Result_5);
+   getTournament: (text) -> (Result_4) query;
+   manageAuth: (AuthArgs) -> (Result_3);
+   updateTournament: (TournamentArgs, text) -> (Result_2);
+   updatedProposal: (text, text, text) -> (Result_1);
+   voteUp: (text) -> (Result);
  };
 type TournamentSuccess = 
  record {
@@ -54,6 +60,12 @@ type TournamentArgs =
    startDate: text;
    status: Status;
  };
+type Status__1 = 
+ variant {
+   Accepted;
+   Denied;
+   OnHold;
+ };
 type Status = 
  variant {
    Active;
@@ -61,22 +73,22 @@ type Status =
    Finished;
    OnHold;
  };
-type Result_6 = 
- variant {
-   err: TournamentError;
-   ok: text;
- };
-type Result_5 = 
+type Result_9 = 
  variant {
    err: Error__1;
    ok;
  };
-type Result_4 = 
+type Result_8 = 
+ variant {
+   err: ProposalError;
+   ok: vec ProposalSuccess;
+ };
+type Result_7 = 
  variant {
    err: TournamentError;
    ok: vec TournamentSuccess;
  };
-type Result_3 = 
+type Result_6 = 
  variant {
    err: TournamentError;
    ok: record {
@@ -84,19 +96,39 @@ type Result_3 =
          rewards: text;
        };
  };
-type Result_2 = 
+type Result_5 = 
+ variant {
+   err: ProposalError;
+   ok: Proposal;
+ };
+type Result_4 = 
  variant {
    err: TournamentError;
    ok: TournamentSuccess;
  };
-type Result_1 = 
+type Result_3 = 
  variant {
    err: Error;
    ok: opt vec principal;
  };
-type Result = 
+type Result_2 = 
  variant {
    err: TournamentError;
+   ok;
+ };
+type Result_10 = 
+ variant {
+   err: TournamentError;
+   ok: text;
+ };
+type Result_1 = 
+ variant {
+   err: ProposalError;
+   ok: text;
+ };
+type Result = 
+ variant {
+   err: ProposalError;
    ok;
  };
 type RequestArgs = 
@@ -107,6 +139,35 @@ type RequestArgs =
    IsIn: principal;
    Remove: principal;
    RemoveAll;
+ };
+type ProposalSuccess = 
+ record {
+   description: text;
+   id: text;
+   isHolder: bool;
+   owner: opt principal;
+   status: Status__1;
+   title: text;
+   vote: nat;
+ };
+type ProposalError = 
+ variant {
+   AlreadyExistsProposal;
+   NoneProposals;
+   NotAccepted;
+   NotFoundProposal;
+   NotHolder;
+   NotOwner;
+   Unknow: text;
+ };
+type Proposal = 
+ record {
+   description: text;
+   isHolder: bool;
+   owner: opt principal;
+   status: Status__1;
+   title: text;
+   vote: nat;
  };
 type PlayerStatsSuccess = 
  record {
@@ -156,4 +217,4 @@ type AuthArgs =
    Auth: RequestArgs;
    GameServers: RequestArgs;
  };
-service : (InitArgs) -> anon_class_33_1
+service : (InitArgs) -> anon_class_35_1

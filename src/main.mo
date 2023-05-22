@@ -27,7 +27,9 @@ import U "./utils";
 import AID "./utils/Account";
 import Hex "./utils/Hex";
 import Auth "./modules/Auth";
+import DAO "./modules/dao";
 
+import HashMap "mo:base/HashMap";
 import CanIds "../canister-ids";
 
 shared ({ caller = owner }) actor class (
@@ -35,11 +37,16 @@ shared ({ caller = owner }) actor class (
 ) = eTournamentManager {
 
   type Time = Time.Time;
+  type Proposal = DAO.Proposal;
+  type ProposalError = DAO.ProposalError;
+  type ProposalSuccess = DAO.ProposalSuccess;
 
   stable let environment : Text = initArgs.environment;
 
   stable var authState = Auth.init(initArgs);
   // stable var admins : [Principal] = initOptions.admins;
+
+  stable var proposals: Trie.Trie<Text, Proposal> = Trie.empty();
 
   stable var tournaments : Trie.Trie<Text, ST.Tournament> = Trie.empty();
 
@@ -662,6 +669,191 @@ shared ({ caller = owner }) actor class (
 
   system func postupgrade() {
     stTournamentPlayerStats := [];
+  };
+
+//--------> Dao > Proposals 
+
+  public shared ({ caller }) func createProposal(newTitle: Text, newDescription: Text): async Result.Result<Text, ProposalError>{
+    let g = Source.Source();
+    let proposalId = UUID.toText(await g.new());
+
+    let createdProposal = {
+        title = newTitle;
+        owner = ?caller;
+        description= newDescription;
+        vote = 0;
+        isHolder = false;
+        status = #OnHold;
+    };
+
+    let (newProposals, exists) = Trie.put(
+      proposals, 
+      U.keyText(proposalId), 
+      Text.equal, createdProposal);
+
+    switch(exists) {
+      case(null) { 
+        proposals := newProposals;
+
+        return #ok(proposalId);
+       };
+      case(?psls) { 
+        return #err(#AlreadyExistsProposal)
+      };
+    };
+
+  };
+
+  public shared ({ caller }) func getProposal(proposalId: Text): async Result.Result<Proposal, ProposalError>{
+    let proposal = Trie.get(
+      proposals,
+      U.keyText(proposalId),
+      Text.equal
+    );
+
+      switch(proposal) {
+        case(?ok) { 
+          return #ok(ok);
+         };
+        case(null) { 
+          return #err(#NotFoundProposal);
+        };
+      };
+
+  };
+
+  public func getAllProposals(): async Result.Result<[ProposalSuccess], ProposalError> {
+    let proposalsBuff : Buffer.Buffer<ProposalSuccess> = Buffer.Buffer(0);
+
+    for ((id, proposal) in Trie.iter(proposals)){
+      let proposalSuccess: ProposalSuccess = {
+        id = id;
+        title = proposal.title;
+        description = proposal.description;
+        owner = proposal.owner;
+        vote = proposal.vote;
+        isHolder = proposal.isHolder;
+        status = proposal.status;
+      };
+
+      let buffUpdated = proposalsBuff.add(proposalSuccess);
+
+    };
+
+      if(proposalsBuff.size() >= 1){
+        return #ok(proposalsBuff.toArray());
+      } else{
+        return #err(#NoneProposals);
+      };
+
+  };
+
+  public shared ({ caller }) func updatedProposal(proposalId: Text, newTitle: Text, newDescription: Text): async Result.Result<Text, ProposalError>{
+      let proposal = Trie.get(
+       proposals,
+        U.keyText(proposalId),
+        Text.equal
+    );
+
+      switch(proposal) {
+        case(?ok) { 
+
+          if(ok.owner == ?caller){
+            var newProposal: Proposal = {
+              title = newTitle;
+              owner = ok.owner;
+              description= newDescription;
+              vote = ok.vote;
+              isHolder = ok.isHolder;
+              status = ok.status;
+            };
+
+              proposals := Trie.replace(
+                proposals,
+                U.keyText(proposalId),
+                Text.equal,
+                ?newProposal
+              ).0;
+
+
+            return #ok(proposalId);
+          } else{
+            return #err(#NotOwner);
+          };
+
+
+         };
+        case(null) { 
+          return #err(#NotFoundProposal);
+        };
+      };
+
+  };
+
+  public shared ({caller}) func deleteProposal(proposalId: Text) : async Result.Result<(), ProposalError>{
+      let proposal = Trie.get(
+       proposals,
+        U.keyText(proposalId),
+        Text.equal
+    );
+
+      switch(proposal) {
+        case(?ok) { 
+
+          if(ok.owner == ?caller){
+
+              proposals := Trie.replace(
+                proposals,
+                U.keyText(proposalId),
+                Text.equal,
+                null
+              ).0;
+
+
+            return #ok(());
+          } else{
+            return #err(#NotOwner);
+          };
+
+         };
+        case(null) { 
+          return #err(#NotFoundProposal);
+        };
+      };
+  };
+
+  public func voteUp(proposalId: Text): async Result.Result<(), ProposalError>{
+      let proposal = Trie.get(
+       proposals,
+        U.keyText(proposalId),
+        Text.equal
+    );
+
+      switch(proposal) {
+        case(?ok) { 
+            var newProposal: Proposal = {
+              title = ok.title;
+              owner = ok.owner;
+              description= ok.description;
+              vote = ok.vote + 1;
+              isHolder = ok.isHolder;
+              status = ok.status;
+            };
+
+              proposals := Trie.replace(
+                proposals,
+                U.keyText(proposalId),
+                Text.equal,
+                ?newProposal
+              ).0;
+
+            return #ok(());
+         };
+        case(null) { 
+          return #err(#NotFoundProposal);
+        };
+      };
+
   };
 
 };

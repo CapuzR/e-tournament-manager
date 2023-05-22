@@ -1,20 +1,3 @@
-type anon_class_35_1 = 
- service {
-   addTournament: (TournamentArgs) -> (Result_10);
-   createProposal: (text, text) -> (Result_1);
-   deleteProposal: (text) -> (Result);
-   deleteTournament: (text) -> (Result_2);
-   endTournament: (text) -> (Result_9);
-   getAllProposals: () -> (Result_8);
-   getAllTournaments: () -> (Result_7) query;
-   getLeaderboard: (text) -> (Result_6);
-   getProposal: (text) -> (Result_5);
-   getTournament: (text) -> (Result_4) query;
-   manageAuth: (AuthArgs) -> (Result_3);
-   updateTournament: (TournamentArgs, text) -> (Result_2);
-   updatedProposal: (text, text, text) -> (Result_1);
-   voteUp: (text) -> (Result);
- };
 type TournamentSuccess = 
  record {
    boostsSetAt: text;
@@ -75,20 +58,25 @@ type Status =
  };
 type Result_9 = 
  variant {
+   err: TournamentError;
+   ok: text;
+ };
+type Result_8 = 
+ variant {
    err: Error__1;
    ok;
  };
-type Result_8 = 
+type Result_7 = 
  variant {
    err: ProposalError;
    ok: vec ProposalSuccess;
  };
-type Result_7 = 
+type Result_6 = 
  variant {
    err: TournamentError;
    ok: vec TournamentSuccess;
  };
-type Result_6 = 
+type Result_5 = 
  variant {
    err: TournamentError;
    ok: record {
@@ -96,40 +84,30 @@ type Result_6 =
          rewards: text;
        };
  };
-type Result_5 = 
+type Result_4 = 
  variant {
    err: ProposalError;
    ok: Proposal;
  };
-type Result_4 = 
+type Result_3 = 
  variant {
    err: TournamentError;
    ok: TournamentSuccess;
  };
-type Result_3 = 
+type Result_2 = 
  variant {
    err: Error;
    ok: opt vec principal;
  };
-type Result_2 = 
+type Result_1 = 
  variant {
    err: TournamentError;
    ok;
- };
-type Result_10 = 
- variant {
-   err: TournamentError;
-   ok: text;
- };
-type Result_1 = 
- variant {
-   err: ProposalError;
-   ok: text;
  };
 type Result = 
  variant {
    err: ProposalError;
-   ok;
+   ok: text;
  };
 type RequestArgs = 
  variant {
@@ -217,4 +195,17 @@ type AuthArgs =
    Auth: RequestArgs;
    GameServers: RequestArgs;
  };
-service : (InitArgs) -> anon_class_35_1
+service : {
+  addTournament: (TournamentArgs) -> (Result_9);
+  createProposal: (text, text) -> (Result);
+  deleteTournament: (text) -> (Result_1);
+  endTournament: (text) -> (Result_8);
+  getAllProposals: () -> (Result_7);
+  getAllTournaments: () -> (Result_6) query;
+  getLeaderboard: (text) -> (Result_5);
+  getProposal: (text) -> (Result_4);
+  getTournament: (text) -> (Result_3) query;
+  manageAuth: (AuthArgs) -> (Result_2);
+  updateTournament: (TournamentArgs, text) -> (Result_1);
+  updatedProposal: (text, text, text) -> (Result);
+}
