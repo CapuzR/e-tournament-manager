@@ -40,14 +40,43 @@ export const idlFactory = ({ IDL }) => {
     'NonExistentCanister' : IDL.Null,
     'EmptyStats' : IDL.Null,
   });
-  const Result_6 = IDL.Variant({ 'ok' : IDL.Text, 'err' : TournamentError });
-  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : TournamentError });
+  const Result_10 = IDL.Variant({ 'ok' : IDL.Text, 'err' : TournamentError });
+  const ProposalError = IDL.Variant({
+    'NoneProposals' : IDL.Null,
+    'NotFoundProposal' : IDL.Null,
+    'Unknow' : IDL.Text,
+    'AlreadyExistsProposal' : IDL.Null,
+    'NotOwner' : IDL.Null,
+    'NotAccepted' : IDL.Null,
+    'NotHolder' : IDL.Null,
+  });
+  const Result_1 = IDL.Variant({ 'ok' : IDL.Text, 'err' : ProposalError });
+  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : ProposalError });
+  const Result_2 = IDL.Variant({ 'ok' : IDL.Null, 'err' : TournamentError });
   const Error__1 = IDL.Variant({
     'NonExistentTournament' : IDL.Null,
     'NotAuthorized' : IDL.Null,
     'NonExistentCanister' : IDL.Null,
   });
-  const Result_5 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error__1 });
+  const Result_9 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error__1 });
+  const Status__1 = IDL.Variant({
+    'OnHold' : IDL.Null,
+    'Denied' : IDL.Null,
+    'Accepted' : IDL.Null,
+  });
+  const ProposalSuccess = IDL.Record({
+    'id' : IDL.Text,
+    'status' : Status__1,
+    'title' : IDL.Text,
+    'isHolder' : IDL.Bool,
+    'owner' : IDL.Opt(IDL.Principal),
+    'vote' : IDL.Nat,
+    'description' : IDL.Text,
+  });
+  const Result_8 = IDL.Variant({
+    'ok' : IDL.Vec(ProposalSuccess),
+    'err' : ProposalError,
+  });
   const TournamentSuccess = IDL.Record({
     'id' : IDL.Text,
     'status' : Status,
@@ -64,7 +93,7 @@ export const idlFactory = ({ IDL }) => {
     'externalCollections' : IDL.Vec(ExternalCollection),
     'startDate' : IDL.Text,
   });
-  const Result_4 = IDL.Variant({
+  const Result_7 = IDL.Variant({
     'ok' : IDL.Vec(TournamentSuccess),
     'err' : TournamentError,
   });
@@ -79,14 +108,23 @@ export const idlFactory = ({ IDL }) => {
       'externalResults' : IDL.Opt(IDL.Nat),
     }),
   });
-  const Result_3 = IDL.Variant({
+  const Result_6 = IDL.Variant({
     'ok' : IDL.Record({
       'leaderboard' : IDL.Vec(PlayerStatsSuccess),
       'rewards' : IDL.Text,
     }),
     'err' : TournamentError,
   });
-  const Result_2 = IDL.Variant({
+  const Proposal = IDL.Record({
+    'status' : Status__1,
+    'title' : IDL.Text,
+    'isHolder' : IDL.Bool,
+    'owner' : IDL.Opt(IDL.Principal),
+    'vote' : IDL.Nat,
+    'description' : IDL.Text,
+  });
+  const Result_5 = IDL.Variant({ 'ok' : Proposal, 'err' : ProposalError });
+  const Result_4 = IDL.Variant({
     'ok' : TournamentSuccess,
     'err' : TournamentError,
   });
@@ -108,21 +146,31 @@ export const idlFactory = ({ IDL }) => {
     'NotAuthorized' : IDL.Null,
     'NonExistentRole' : IDL.Null,
   });
-  const Result_1 = IDL.Variant({
+  const Result_3 = IDL.Variant({
     'ok' : IDL.Opt(IDL.Vec(IDL.Principal)),
     'err' : Error,
   });
-  const anon_class_33_1 = IDL.Service({
-    'addTournament' : IDL.Func([TournamentArgs], [Result_6], []),
-    'deleteTournament' : IDL.Func([IDL.Text], [Result], []),
-    'endTournament' : IDL.Func([IDL.Text], [Result_5], []),
-    'getAllTournaments' : IDL.Func([], [Result_4], ['query']),
-    'getLeaderboard' : IDL.Func([IDL.Text], [Result_3], []),
-    'getTournament' : IDL.Func([IDL.Text], [Result_2], ['query']),
-    'manageAuth' : IDL.Func([AuthArgs], [Result_1], []),
-    'updateTournament' : IDL.Func([TournamentArgs, IDL.Text], [Result], []),
+  const anon_class_35_1 = IDL.Service({
+    'addTournament' : IDL.Func([TournamentArgs], [Result_10], []),
+    'createProposal' : IDL.Func([IDL.Text, IDL.Text], [Result_1], []),
+    'deleteProposal' : IDL.Func([IDL.Text], [Result], []),
+    'deleteTournament' : IDL.Func([IDL.Text], [Result_2], []),
+    'endTournament' : IDL.Func([IDL.Text], [Result_9], []),
+    'getAllProposals' : IDL.Func([], [Result_8], []),
+    'getAllTournaments' : IDL.Func([], [Result_7], ['query']),
+    'getLeaderboard' : IDL.Func([IDL.Text], [Result_6], []),
+    'getProposal' : IDL.Func([IDL.Text], [Result_5], []),
+    'getTournament' : IDL.Func([IDL.Text], [Result_4], ['query']),
+    'manageAuth' : IDL.Func([AuthArgs], [Result_3], []),
+    'updateTournament' : IDL.Func([TournamentArgs, IDL.Text], [Result_2], []),
+    'updatedProposal' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text],
+        [Result_1],
+        [],
+      ),
+    'voteUp' : IDL.Func([IDL.Text], [Result], []),
   });
-  return anon_class_33_1;
+  return anon_class_35_1;
 };
 export const init = ({ IDL }) => {
   const InitArgs = IDL.Record({

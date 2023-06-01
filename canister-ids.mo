@@ -17,13 +17,13 @@ module {
         staging : Text = "";
         production : Text = "";
     };
-   let eBRServiceCanId : Environments = { local : Text = "r7inp-6aaaa-aaaaa-aaabq-cai"; staging : Text = "x6h7n-bqaaa-aaaan-qajxq-cai"; production : Text = ""; };
+   let eBRServiceCanId : Environments = { local : Text = "bkyz2-fmaaa-aaaaa-qaaaq-cai"; staging : Text = ""; production : Text = ""; };
     let eAdminFrontendCanId : Environments = {
         local : Text = "";
         staging : Text = "";
         production : Text = "";
     };
-   let eAssetManagerCanId : Environments = { local : Text = "rno2w-sqaaa-aaaaa-aaacq-cai"; staging : Text = "bme3e-ryaaa-aaaan-qagda-cai"; production : Text = ""; };
+   let eAssetManagerCanId : Environments = { local : Text = "be2us-64aaa-aaaaa-qaabq-cai"; staging : Text = ""; production : Text = ""; };
     let eTournamentManagerCanId : Environments = {
         local : Text = "";
         staging : Text = "";
